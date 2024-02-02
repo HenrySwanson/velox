@@ -54,12 +54,11 @@ class SetAccumulatorTest : public testing::Test, public test::VectorTestBase {
 
     // Serialize the accumulator.
     auto serialized = BaseVector::create(VARBINARY(), 1, pool());
-    accumulator.extractSerialized(serialized, 0);
+    accumulator.serialize(serialized, 0);
 
     // Initialize another accumulator from the serialized vector.
     SetAccumulator<T> accumulator2(data->type(), allocator());
-    accumulator2.addSerialized(
-        *serialized->asFlatVector<StringView>(), 0, allocator());
+    accumulator2.deserialize(serialized->asFlatVector<StringView>()->valueAt(0), allocator());
 
     // Extract the contents of the accumulator. The contents should match
     // all the uniqueValues.
@@ -132,12 +131,12 @@ class SetAccumulatorTest : public testing::Test, public test::VectorTestBase {
 
     // Serialize the accumulator.
     auto serialized = BaseVector::create(VARBINARY(), 1, pool());
-    accumulator1.extractSerialized(serialized, 0);
+    accumulator1.serialize(serialized, 0);
 
     // Initialize another accumulator from the serialized vector.
     SetAccumulator<ComplexType> accumulator2(data->type(), allocator());
-    accumulator2.addSerialized(
-        *serialized->asFlatVector<StringView>(), 0, allocator());
+    accumulator2.deserialize(
+        serialized->asFlatVector<StringView>()->valueAt(0), allocator());
     ASSERT_EQ(accumulator2.size(), accumulator1.size());
     accumulatorSizeCheck(accumulator2);
 

@@ -108,10 +108,11 @@ class TypedDistinctAggregations : public DistinctAggregations {
       const VectorPtr& input,
       vector_size_t index) override {
     auto* serializedVector = input->asFlatVector<StringView>();
+    VELOX_CHECK_LE(index, serializedVector->size());
 
     auto* accumulator = reinterpret_cast<AccumulatorType*>(group + offset_);
     RowSizeTracker<char, uint32_t> tracker(group[rowSizeOffset_], *allocator_);
-    accumulator->addSerialized(*serializedVector, index, allocator_);
+    accumulator->deserialize(serializedVector->valueAt(index), allocator_);
   }
 
   void extractValues(folly::Range<char**> groups, const RowVectorPtr& result)
@@ -205,7 +206,7 @@ class TypedDistinctAggregations : public DistinctAggregations {
     for (auto i = 0; i < groups.size(); ++i) {
       auto* accumulator =
           reinterpret_cast<AccumulatorType*>(groups[i] + offset_);
-      accumulator->extractSerialized(result, i);
+      accumulator->serialize(result, i);
     }
   }
 
