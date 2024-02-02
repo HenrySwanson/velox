@@ -148,7 +148,7 @@ struct SetAccumulator {
     // present) followed by the unique values in order of their indices.
     // The null position is skipped when serializing the values.
     size_t valueSize = sizeof(T);
-    size_t totalBytes = kVectorSizeT + (valueSize) * uniqueValues.size();
+    size_t totalBytes = kVectorSizeT + (valueSize)*uniqueValues.size();
 
     auto* flatResult = result->as<FlatVector<StringView>>();
     auto* rawBuffer = flatResult->getRawStringBufferWithSpace(totalBytes, true);
@@ -253,7 +253,8 @@ struct StringViewSetAccumulator {
       if (!base.nullIndex.has_value() || index != base.nullIndex.value()) {
         // This is a valid unique value.
         length = stream.read<vector_size_t>();
-        addValue(StringView(stream.read<char>(length), length), index, allocator);
+        addValue(
+            StringView(stream.read<char>(length), length), index, allocator);
       }
       index++;
     }
@@ -410,7 +411,8 @@ struct ComplexTypeSetAccumulator {
         length = stream.read<vector_size_t>();
         hash = stream.read<uint64_t>();
 
-        auto result = values.appendSerialized(StringView(stream.read<char>(length), length), hash, allocator);
+        auto result = values.appendSerialized(
+            StringView(stream.read<char>(length), length), hash, allocator);
         if (!base.uniqueValues.insert({result, index}).second) {
           values.removeLast(result);
         } else {

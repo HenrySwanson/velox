@@ -58,7 +58,8 @@ class SetAccumulatorTest : public testing::Test, public test::VectorTestBase {
 
     // Initialize another accumulator from the serialized vector.
     SetAccumulator<T> accumulator2(data->type(), allocator());
-    accumulator2.deserialize(serialized->asFlatVector<StringView>()->valueAt(0), allocator());
+    accumulator2.deserialize(
+        serialized->asFlatVector<StringView>()->valueAt(0), allocator());
 
     // Extract the contents of the accumulator. The contents should match
     // all the uniqueValues.
